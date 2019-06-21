@@ -10,7 +10,7 @@ int main()
     // Parent process
     if (child_pid > 0) {
             printf("parent process pid:%d\n", getpid());
-        wait(NULL);
+//        wait(NULL);
         sleep(100);
             printf("parent is stopped!\n");
     }
