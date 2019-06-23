@@ -34,29 +34,33 @@ int main() {
 
 void *father(void *arg) {
     while(1) {
+        sleep(5);  //simulate peel apple
         sem_wait(&remain);
         sem_wait(&mutex);
-        printf("father  %lc: before put apple, remain=%u, apple=%u, pear=%u\n",   0x1F468, nremain, napple, npear);
+        printf("father  %lc: before put apple, remain=%u, apple%lc =%u, pear%lc =%u\n",
+                0x1F468, nremain, 0x1F34E, napple, 0x1F350, npear);
         nremain--;
         napple++;
-        printf("father  %lc: after  put apple, remain=%u, apple=%u, pear=%u\n\n", 0x1F468, nremain, napple, npear);
+        printf("father  %lc: after  put apple, remain=%u, apple%lc =%u, pear%lc =%u\n\n",
+                0x1F468, nremain, 0x1F34E, napple, 0x1F350, npear);
         sem_post(&mutex);
         sem_post(&apple);
-        sleep(5);
     }
 }
 
 void *mather(void *arg) {
     while(1) {
+        sleep(7);   //simulate peel pear
         sem_wait(&remain);
         sem_wait(&mutex);
-        printf("mother  %lc: before put pear , remain=%u, apple=%u, pear=%u\n", 0x1F469, nremain, napple, npear);
+        printf("mother  %lc: before put pear , remain=%u, apple%lc =%u, pear%lc =%u\n",
+                0x1F469, nremain, 0x1F34E, napple, 0x1F350, npear);
         nremain--;
         npear++;
-        printf("mother  %lc: after  put pear , remain=%u, apple=%u, pear=%u\n\n",0x1F469,  nremain, napple, npear);
+        printf("mother  %lc: after  put pear , remain=%u, apple%lc =%u, pear%lc =%u\n\n",
+                0x1F469, nremain, 0x1F34E, napple, 0x1F350, npear);
         sem_post(&mutex);
         sem_post(&pear);
-        sleep(7);
     }
 }
 
@@ -64,13 +68,15 @@ void *son(void *arg) {
     while(1) {
         sem_wait(&pear);
         sem_wait(&mutex);
-        printf("son     %lc: before eat pear , remain=%u, apple=%u, pear=%u\n", 0x1F466, nremain, napple, npear);
+        printf("son     %lc: before eat pear , remain=%u, apple%lc =%u, pear%lc =%u\n",
+                0x1F466, nremain, 0x1F34E, napple, 0x1F350, npear);
         nremain++;
         npear--;
-        printf("son     %lc: after  eat pear , remain=%u, apple=%u, pear=%u\n\n", 0x1F466, nremain, napple, npear);
+        printf("son     %lc: after  eat pear , remain=%u, apple%lc =%u, pear%lc =%u\n\n",
+                0x1F466, nremain, 0x1F34E, napple, 0x1F350, npear);
         sem_post(&mutex);
         sem_post(&remain);
-        sleep(10);
+        sleep(10); //simulate eat pear
     }
 }
 
@@ -78,13 +84,15 @@ void *daughter(void *arg) {
     while(1) {
         sem_wait(&apple);
         sem_wait(&mutex);
-        printf("daughter%lc: before eat apple, remain=%u, apple=%u, pear=%u\n", 0x1F467, nremain, napple, npear);
+        printf("daughter%lc: before eat apple, remain=%u, apple%lc =%u, pear%lc =%u\n",
+                0x1F467, nremain, 0x1F34E, napple, 0x1F350, npear);
         nremain++;
         napple--;
-        printf("daughter%lc: after  eat apple, remain=%u, apple=%u, pear=%u\n\n", 0x1F467, nremain, napple, npear);
+        printf("daughter%lc: after  eat apple, remain=%u, apple%lc =%u, pear%lc =%u\n\n",
+                0x1F467, nremain, 0x1F34E, napple, 0x1F350, npear);
         sem_post(&mutex);
         sem_post(&remain);
-        sleep(10);
+        sleep(10); //simulate eat apple
     }
 }
 
