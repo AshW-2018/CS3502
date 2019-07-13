@@ -3,49 +3,47 @@
 #include <linux/proc_fs.h>
 #include <linux/string.h>
 #include <linux/vmalloc.h>
-#include <asm/uaccess.h>
+#include <linux/slab.h>
+#include <linux/uaccess.h>
 
 #define MAX_LEN       4096
-int read_info( char *page, char **start, off_t off,int count, int *eof, void *data );
-ssize_t write_info( struct file *filp, const char __user *buff,unsigned long len, void *data );
-
 static struct proc_dir_entry *proc_entry;
-static char *info;
-static int write_index;
-static int read_index;
+
+
+ssize_t read_proc(struct file *f, char *user_buf, size_t count, loff_t *off )
+{
+	//output the content of info to user's buffer pointed by page
+	return count;
+}
+
+
+ssize_t write_proc(struct file *f, const char *user_buf, size_t count, loff_t *off)
+{
+	//copy the written data from user space and save it in info
+	return count;
+}
+
+
+struct file_operations proc_fops = {
+	read: read_proc,
+	write: write_proc
+};
+
 
 int init_module( void )
 {
-    int ret = 0;
-    // allocated memory space for the proc entry
-    info = (char *)vmalloc( MAX_LEN );
-    memset( info, 0, MAX_LEN );
+	int ret = 0;
+	//create the entry and allocated memory space for the proc entry
 
-    //create the entry
+	printk(KERN_INFO "test_proc created.\n");
 
-    write_index = 0;
-    read_index = 0;
-    //register the write and read callback functions
-    proc_entry->read_proc = read_info;
-    proc_entry->write_proc = write_info;
-    printk(KERN_INFO "test_proc created.\n");
-
-    return ret;
+	return ret;
 }
+
 
 void cleanup_module( void )
 {
-    //remove the proc entry and free info space
+	//remove the proc entry and free info space
 }
 
-ssize_t write_info( struct file *filp, const char __user *buff, unsigned long len, void *data )
-{
-    //copy the written data from user space and save it in info
-    return len;
-}
 
-int read_info( char *page, char **start, off_t off, int count, int *eof, void *data )
-{
-    //output the content of info to user's buffer pointed by page
-    return len;
-}
