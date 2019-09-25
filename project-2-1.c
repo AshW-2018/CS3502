@@ -51,7 +51,6 @@ int num_substring(void)
 			}
 
 			if(count==n2){  
-			    printf("total: %d\n", total); 
 				total++;		/*find a substring in this step*/   
 			}                       
 		}
