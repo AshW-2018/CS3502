@@ -11,7 +11,7 @@
 #include <sys/param.h>
 #include <sched.h>
 
-#define K 400 // genreate a data node for K times in each thread
+#define K 800 // genreate a data node for K times in each thread
 
 struct Node
 {
@@ -28,17 +28,6 @@ struct list
 pthread_mutex_t    mutex_lock;
 
 struct list *List;
-
-void bind_thread_to_cpu(int cpuid) {
-     cpu_set_t mask;
-     CPU_ZERO(&mask);
-
-     CPU_SET(cpuid, &mask);
-     if (sched_setaffinity(0, sizeof(cpu_set_t), &mask)) {
-         fprintf(stderr, "sched_setaffinity");
-         exit(EXIT_FAILURE);
-     }
-}
 
 struct Node* generate_data_node()
 {

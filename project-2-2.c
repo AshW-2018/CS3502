@@ -11,7 +11,7 @@
 #include <sys/param.h>
 #include <sched.h>
 
-#define K 400 // genreate a data node for K times in each thread
+#define K 800 // genreate a data node for K times in each thread
 
 struct Node
 {
@@ -29,17 +29,6 @@ pthread_mutex_t    mutex_lock;
 
 struct list *List;
 
-void bind_thread_to_cpu(int cpuid) {
-     cpu_set_t mask;
-     CPU_ZERO(&mask);
-
-     CPU_SET(cpuid, &mask);
-     if (sched_setaffinity(0, sizeof(cpu_set_t), &mask)) {
-         fprintf(stderr, "sched_setaffinity");
-         exit(EXIT_FAILURE);
-     }
-}
-
 struct Node* generate_data_node()
 {
     struct Node *ptr;
@@ -56,8 +45,6 @@ struct Node* generate_data_node()
 
 void * producer_thread( void *arg)
 {
-    bind_thread_to_cpu(*((int*)arg));//bind this thread to a CPU
-
     struct Node * ptr, tmp;
     int counter = 0;  
 
@@ -97,30 +84,11 @@ int main(int argc, char* argv[])
 {
     int i, num_threads;
 
-    int NUM_PROCS;//number of CPU
-    int* cpu_array = NULL;
-
     struct Node  *tmp,*next;
     struct timeval starttime, endtime;
 
     num_threads = atoi(argv[1]); //read num_threads from user
     pthread_t producer[num_threads];
-    NUM_PROCS = sysconf(_SC_NPROCESSORS_CONF);//get number of CPU
-    if( NUM_PROCS > 0)
-    {
-        cpu_array = (int *)malloc(NUM_PROCS*sizeof(int));
-        if( cpu_array == NULL )
-        {
-            printf("Allocation failed!\n");
-            exit(0);
-        }
-        else
-        {
-            for( i = 0; i < NUM_PROCS; i++)
-               cpu_array[i] = i;
-        }
-
-    }
 
     pthread_mutex_init(&mutex_lock, NULL);
 
@@ -135,7 +103,7 @@ int main(int argc, char* argv[])
     gettimeofday(&starttime,NULL); //get program start time
     for( i = 0; i < num_threads; i++ )
     {
-        pthread_create(&(producer[i]), NULL, (void *) producer_thread, &cpu_array[i%NUM_PROCS]); 
+        pthread_create(&(producer[i]), NULL, (void *) producer_thread, NULL); 
     }
 
     for( i = 0; i < num_threads; i++ )
@@ -158,8 +126,6 @@ int main(int argc, char* argv[])
            tmp = next;
         }            
     }
-    if( cpu_array!= NULL)
-       free(cpu_array);
     /* calculate program runtime */
     printf("Total run time is %ld microseconds.\n", (endtime.tv_sec-starttime.tv_sec) * 1000000+(endtime.tv_usec-starttime.tv_usec));
     return 0; 
