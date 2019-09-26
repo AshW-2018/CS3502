@@ -54,10 +54,8 @@ struct Node* generate_data_node()
     return ptr;
 }
 
-void * producer_thread( void *arg)
+void * producer_thread(struct list *lt)
 {
-    bind_thread_to_cpu(*((int*)arg));//bind this thread to a CPU
-
     struct Node * ptr, tmp;
     int counter = 0;  
 
@@ -68,26 +66,17 @@ void * producer_thread( void *arg)
 
         if( NULL != ptr )
         {
-            while(1)
-            {
-		/* access the critical region and add a node to the global list */
-                if( !pthread_mutex_trylock(&mutex_lock) )
-                {
                     ptr->data  = 1;//generate data
 		    /* attache the generated node to the global list */
-                    if( List->header == NULL )
+                    if( lt->header == NULL )
                     {
-                        List->header = List->tail = ptr;
+                        lt->header = lt->tail = ptr;
                     }
                     else
                     {
-                        List->tail->next = ptr;
-                        List->tail = ptr;
+                        lt->tail->next = ptr;
+                        lt->tail = ptr;
                     }                    
-                    pthread_mutex_unlock(&mutex_lock);
-                    break;
-                }
-            }           
         }
         ++counter;
     }
@@ -97,32 +86,12 @@ int main(int argc, char* argv[])
 {
     int i, num_threads;
 
-    int NUM_PROCS;//number of CPU
-    int* cpu_array = NULL;
-
     struct Node  *tmp,*next;
     struct timeval starttime, endtime;
 
     num_threads = atoi(argv[1]); //read num_threads from user
     pthread_t producer[num_threads];
-    NUM_PROCS = sysconf(_SC_NPROCESSORS_CONF);//get number of CPU
-    if( NUM_PROCS > 0)
-    {
-        cpu_array = (int *)malloc(NUM_PROCS*sizeof(int));
-        if( cpu_array == NULL )
-        {
-            printf("Allocation failed!\n");
-            exit(0);
-        }
-        else
-        {
-            for( i = 0; i < NUM_PROCS; i++)
-               cpu_array[i] = i;
-        }
-
-    }
-
-    pthread_mutex_init(&mutex_lock, NULL);
+    struct list* localList[num_threads];  //num_threads localList
 
     List = (struct list *)malloc(sizeof(struct list));
     if( NULL == List )
@@ -132,10 +101,20 @@ int main(int argc, char* argv[])
     }
     List->header = List->tail = NULL;
 
+    //init the local list
+    for (i=0; i < num_threads; i++) {
+	localList[i] = (struct list *)malloc(sizeof(struct list));
+    	if( NULL == localList[i]) {
+		printf("Local list %d end here\n", i);
+		exit(0);
+	}
+	localList[i]->header = localList[i]->tail = NULL;
+    }
+
     gettimeofday(&starttime,NULL); //get program start time
     for( i = 0; i < num_threads; i++ )
     {
-        pthread_create(&(producer[i]), NULL, (void *) producer_thread, &cpu_array[i%NUM_PROCS]); 
+        pthread_create(&(producer[i]), NULL, (void *) producer_thread, localList[i]); 
     }
 
     for( i = 0; i < num_threads; i++ )
@@ -144,6 +123,17 @@ int main(int argc, char* argv[])
         {
             pthread_join(producer[i],NULL);
         }
+    }
+
+    //merge localList into globalList
+    for (i=0; i < num_threads; i++) {
+	if (List->header == NULL) {
+		List->header = localList[i]->header;
+		List->tail = localList[i]->tail;
+	} else {
+		List->tail->next = localList[i]->header;
+		List->tail = localList[i]->tail;
+	}
     }
 
     gettimeofday(&endtime,NULL); //get the finish time
@@ -158,8 +148,6 @@ int main(int argc, char* argv[])
            tmp = next;
         }            
     }
-    if( cpu_array!= NULL)
-       free(cpu_array);
     /* calculate program runtime */
     printf("Total run time is %ld microseconds.\n", (endtime.tv_sec-starttime.tv_sec) * 1000000+(endtime.tv_usec-starttime.tv_usec));
     return 0; 
