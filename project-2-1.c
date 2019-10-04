@@ -21,7 +21,7 @@ int readf(FILE *fp)
 		return -1;
 	}
 	s2=(char *)malloc(sizeof(char)*MAX);
-	if(s1==NULL){
+	if(s2==NULL){
 		printf("ERROR: Out of memory\n");
 		return -1;
 	}
