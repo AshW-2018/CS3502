@@ -1,15 +1,14 @@
-#include<linux/module.h>
-#include<linux/list.h>
-#include<linux/init.h>
-#include<linux/kernel.h>
-#include<linux/types.h>
-#include<linux/kthread.h>
-#include<linux/proc_fs.h>
-#include<linux/sched.h>
-#include<linux/mm.h>
-#include<linux/fs.h>
-#include<linux/slab.h>
-#include <asm/io.h>
+#include <linux/module.h>
+#include <linux/list.h>
+#include <linux/init.h>
+#include <linux/kernel.h>
+#include <linux/types.h>
+#include <linux/kthread.h>
+#include <linux/proc_fs.h>
+#include <linux/sched.h>
+#include <linux/mm.h>
+#include <linux/fs.h>
+#include <linux/slab.h>
 
 static struct proc_dir_entry *tempdir, *tempinfo;
 static unsigned char *buffer;
@@ -21,56 +20,67 @@ static int my_map(struct file *filp, struct vm_area_struct *vma);
 
 
 static const struct file_operations myproc_fops = {
-    .mmap   = my_map,
+        .mmap   = my_map,
 };
 
 
 static int my_map(struct file *filp, struct vm_area_struct *vma)
 {
-    // map vma of user space to a continuous physical space
-
-    return 0;
+        // map vma of user space to a continuous physical space
+        return 0;
 }
 
 
 
 static int init_myproc_module(void)
 {
-    //create a directory in /proc
-    //create a new entry under the new directory
-    printk("init myproc module successfully\n");
+        tempdir=proc_mkdir("mydir", NULL);
+        if(tempdir == NULL) {
+                printk("mydir is NULL\n");
+                return -ENOMEM;
+        }
 
-    allocate_memory();
-    //initialize the buffer
-    for(i = 0; i < 12; i++) {
-        buffer[i] = array[i];
-    }
+        tempinfo = proc_create("myinfo", 0, tempdir, &myproc_fops);
+        if(tempinfo == NULL) {
+                printk("myinfo is NULL\n");
+                remove_proc_entry("mydir",NULL);
+                return -ENOMEM;
+        }
+        printk("init myproc module successfully\n");
 
-    return 0;
+        allocate_memory();
+
+        return 0;
 }
 
 
 static void allocate_memory(void)
 {
-    //allocation memory 
-    //set the memory as reserved
+        /* allocation memory */
+        buffer = (unsigned char *)kmalloc(PAGE_SIZE,GFP_KERNEL);
+        /* set the memory as reserved */
+        SetPageReserved(virt_to_page(buffer));
 }
 
 static void clear_memory(void)
 {
-    //clear reserved memory
-    //free memory
+        /* clear reserved memory */
+        ClearPageReserved(virt_to_page(buffer));
+        /* free memory */
+        kfree(buffer);
 }
 
 
 static void exit_myproc_module(void)
 {
-    clear_memory();
-    remove_proc_entry("myinfo", tempdir);
-    remove_proc_entry("mydir", NULL);
-    printk("remove myproc module successfully\n");
+        clear_memory();
+        remove_proc_entry("myinfo", tempdir);
+        remove_proc_entry("mydir", NULL);
+        printk("remove myproc module successfully\n");
 }
 
 module_init(init_myproc_module);
 module_exit(exit_myproc_module);
 MODULE_LICENSE("GPL");
+
+
