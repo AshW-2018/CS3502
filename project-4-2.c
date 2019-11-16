@@ -43,6 +43,7 @@ int init_module( void )
 
 void cleanup_module( void )
 {
+	printk(KERN_INFO "test_proc deleted.\n");
 	//remove the proc entry and free info space
 }
 
