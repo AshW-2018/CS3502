@@ -11,11 +11,22 @@
 
 int main(int argc , char *argv[])
 {
-    unsigned char *p_map;
+        int fd;
+        int i;
+        unsigned char *p_map;
 
-    // open proc file
+        /* open proc file */
+        fd = open("/proc/mydir/myinfo", O_RDWR);
+        if(fd < 0) {
+                printf("open fail\n");
+                exit(1);
+        }else {
+                printf("open successfully\n");
+        }
+
     // map p_map to the proc file and grant read & write privilege
-    // design test case to read from and write to p_map
+    // read data from p_map
     // unmap p_map from the proc file
+
     return 0;
 }
