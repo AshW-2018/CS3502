@@ -13,6 +13,7 @@ static struct proc_dir_entry *proc_entry;
 ssize_t read_proc(struct file *f, char *user_buf, size_t count, loff_t *off )
 {
 	//output the content of info to user's buffer pointed by page
+	printk(KERN_INFO "procfs_read: read %lu bytes\n", count);
 	return count;
 }
 
@@ -20,6 +21,7 @@ ssize_t read_proc(struct file *f, char *user_buf, size_t count, loff_t *off )
 ssize_t write_proc(struct file *f, const char *user_buf, size_t count, loff_t *off)
 {
 	//copy the written data from user space and save it in info
+	printk(KERN_INFO "procfs_write: write %lu bytes\n", count);
 	return count;
 }
 
@@ -43,8 +45,9 @@ int init_module( void )
 
 void cleanup_module( void )
 {
-	printk(KERN_INFO "test_proc deleted.\n");
 	//remove the proc entry and free info space
+	
+	printk(KERN_INFO "test_proc deleted.\n");
 }
 
 
