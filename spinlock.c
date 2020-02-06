@@ -22,6 +22,11 @@ void *compute()
 int main()
 {
     pthread_t thread1, thread2, thread3, thread4, thread5;
+    if (pthread_spin_init(&splock, 0) != 0)
+    {
+        printf("spin init failed\n");
+        return 1;
+    }
 
     pthread_create(&thread1, NULL, compute, (void *)&thread1);
     pthread_create(&thread2, NULL, compute, (void *)&thread2);
@@ -30,6 +35,7 @@ int main()
     pthread_create(&thread5, NULL, compute, (void *)&thread5);
 
     pthread_exit(NULL);
+    pthread_spin_destroy(&splock);
     exit(0);
 }
 
