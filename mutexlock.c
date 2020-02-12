@@ -15,8 +15,8 @@ void *compute()
         counter = counter + 1;
         i++;
     }
-    pthread_mutex_unlock(&mlock);
     printf("Counter value: %d\n", counter);
+    pthread_mutex_unlock(&mlock);
 }
 
 int main()
@@ -38,3 +38,6 @@ int main()
     pthread_mutex_destroy(&mlock);
     exit(0);
 }
+
+
+
