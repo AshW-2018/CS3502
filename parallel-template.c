@@ -70,6 +70,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    for(t=0; t<NUM_THREADS; t++){
+        pthread_join(threads[t], NULL);
+    }
+
  	printf("The number of substrings is: %d\n", totalNum);
 	return 1;
 }
