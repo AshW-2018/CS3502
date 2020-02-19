@@ -1,13 +1,14 @@
 #include <pthread.h>
 #include <stdio.h>
+#include <unistd.h>
 
 pthread_barrier_t b;
 
 void* task(void* param) {
-    int id = (int) param;
-    printf("before the barrier %d\n", id);
+    long id = (long) param;
+    printf("before the barrier %ld\n", id);
     pthread_barrier_wait(&b);
-    printf("after the barrier %d\n", id);
+    printf("after the barrier %ld\n", id);
 }
 
 int main() {
@@ -17,7 +18,7 @@ int main() {
     pthread_t thread[nThread];
     pthread_barrier_init(&b, 0, nThread);
     for (i = 0; i < nThread; i++)
-        pthread_create(&thread[i], 0, task, (void*)i);
+        pthread_create(&thread[i], 0, task, (void*)(intptr_t)i);
     for (i = 0; i < nThread; i++)
         pthread_join(thread[i], 0);
     pthread_barrier_destroy(&b);
