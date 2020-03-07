@@ -53,7 +53,7 @@ void *calSubStringThread(void *threadid){
     long tid = (long)threadid;
     printf("This is thread %ld, ", tid);
     int num = num_substring(tid);
-    printf("find num of is: %ld\n", num);
+    printf("find num of is: %d\n", num);
     pthread_exit(NULL);
 }
 
