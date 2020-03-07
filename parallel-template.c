@@ -40,17 +40,20 @@ int readf(FILE *fp)
 	return 0;
 }
 
-void num_substring(int t)
+int num_substring(int t)
 {
 //add your logic here
 //1, how to distribute different parts of string s1 into different threads
 //2, how to sum up the total number of substring from all threads
+	
+    return 0;
 }
 
 void *calSubStringThread(void *threadid){
     long tid = (long)threadid;
-    printf("This is thread %ld\n", tid);
-    num_substring(tid);
+    printf("This is thread %ld, ", tid);
+    int num = num_substring(tid);
+    printf("find num of is: %ld\n", num);
     pthread_exit(NULL);
 }
 
