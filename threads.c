@@ -15,6 +15,12 @@ void *worker(void *arg) {
 }
 
 int main(int argc, char *argv[]) {
+/*    if (pthread_spin_init(&splock, 0) != 0)
+    {
+        printf("spin init failed\n");
+        return 1;
+    }
+*/	
     if (argc != 2) {
 	fprintf(stderr, "usage: threads <loops>\n");
 	exit(1);
