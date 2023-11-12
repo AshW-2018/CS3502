@@ -26,6 +26,7 @@ static const struct file_operations myproc_fops = {
 
 static int my_map(struct file *filp, struct vm_area_struct *vma)
 {
+        // TODO: implement your code of my_map:
         // get physical address of buffer
         // map vma of user space to the continuous physical space/address (buffer)
         // write the array[12] into the buffer
